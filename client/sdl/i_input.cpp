@@ -860,10 +860,6 @@ void IInputSubsystem::repeatEvents()
 //
 void IInputSubsystem::gatherEvents()
 {
-	event_t mouse_motion_event;
-	mouse_motion_event.type = ev_mouse;
-	mouse_motion_event.data1 = mouse_motion_event.data2 = mouse_motion_event.data3 = 0;
-
 	for (InputDeviceList::iterator it = mInputDevices.begin(); it != mInputDevices.end(); ++it)
 	{
 		IInputDevice* device = *it;
@@ -876,23 +872,9 @@ void IInputSubsystem::gatherEvents()
 			if (mRepeating)
 				addToEventRepeaters(ev);
 
-			if (ev.type == ev_mouse)
-			{
-				// aggregate all mouse motion into a single event, which is enqueued later
-				mouse_motion_event.data2 += ev.data2;
-				mouse_motion_event.data3 += ev.data3;
-			}
-			else
-			{
-				// default behavior for events: just add it to the queue
-				mEvents.push(ev);
-			}
+			mEvents.push(ev);
 		}
 	}
-	
-	// manually add the aggregated mouse motion event to the queue
-	if (mouse_motion_event.data2 || mouse_motion_event.data3)
-		mEvents.push(mouse_motion_event);
 
 	// Handle repeatable events
 	if (mRepeating)
