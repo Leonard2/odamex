@@ -629,6 +629,10 @@ void STACK_ARGS I_ShutdownInput()
 //
 static void I_GetEvents()
 {
+	static event_t mouse_motion;
+	mouse_motion.type = ev_mouse;
+	mouse_motion.data1 = mouse_motion.data2 = mouse_motion.data3 = 0;
+
 	static bool previously_focused = false;
 	bool currently_focused = I_GetWindow()->isFocused();
 	if (currently_focused && !previously_focused)
@@ -647,8 +651,19 @@ static void I_GetEvents()
 	{
 		event_t ev;
 		input_subsystem->getEvent(&ev);
-		D_PostEvent(&ev);
+
+		// Aggregate all mouse movements into one single event
+		if (ev.type == ev_mouse)
+		{
+			mouse_motion.data2 += ev.data2;
+			mouse_motion.data3 += ev.data3;
+		}
+		else
+			D_PostEvent(&ev);
 	}
+
+	if (mouse_motion.data2 || mouse_motion.data3)
+		D_PostEvent(&mouse_motion);
 }
 
 
