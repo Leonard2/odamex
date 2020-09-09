@@ -1464,6 +1464,44 @@ void ISDL20MouseInputDevice::gatherEvents()
 	}
 }
 
+//
+// ISDL20MouseInputDevice::gatherRealtimeMovement
+//
+// Pumps the SDL Event queue and retrieves only mouse motion events and puts them into
+// this instance's event queue.
+//
+void ISDL20MouseInputDevice::gatherRealtimeMovement()
+{
+	if (!active())
+		return;
+
+	// Force SDL to gather events from input devices. This is called
+	// implicitly from SDL_PollEvent but since we're using SDL_PeepEvents to
+	// process only mouse events, SDL_PumpEvents is necessary.
+	SDL_PumpEvents();
+
+	// Retrieve events from SDL
+	int num_events = 0;
+	SDL_Event sdl_events[MAX_SDL_EVENTS_PER_TIC];
+
+	while ((num_events = SDL_PeepEvents(sdl_events, MAX_SDL_EVENTS_PER_TIC, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION)))
+	{
+		// insert the SDL_Events into our queue
+		for (int i = 0; i < num_events; i++)
+		{
+			const SDL_Event& sdl_ev = sdl_events[i];
+			assert(sdl_ev.type == SDL_MOUSEMOTION);
+
+			event_t ev;
+			ev.type = ev_mouse;
+			ev.data1 = 0;
+			ev.data2 = sdl_ev.motion.xrel;
+			ev.data3 = -sdl_ev.motion.yrel;
+
+			mEvents.push(ev);
+		}
+	}
+}
 
 //
 // ISDL20MouseInputDevice::getEvent

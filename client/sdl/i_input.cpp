@@ -40,6 +40,7 @@
 #include "c_cvars.h"
 #include "i_system.h"
 #include "hu_stuff.h"
+#include "g_game.h"
 
 #ifdef _XBOX
 #include "i_xbox.h"
@@ -676,6 +677,23 @@ void I_StartTic (void)
 }
 
 
+//
+// I_GetRealtimeMouse
+//
+void I_GetRealtimeMouse()
+{
+	// Get real-time information about mouse movements
+	input_subsystem->gatherRealtimeMouse();
+	while (input_subsystem->hasEvent())
+	{
+		event_t ev;
+		input_subsystem->getEvent(&ev);
+
+		assert(ev.type == ev_mouse);
+		G_ProcessMouseMovementEvent(&ev);
+	}
+}
+
 
 // ============================================================================
 //
@@ -896,6 +914,26 @@ void IInputSubsystem::gatherEvents()
 		repeatEvents();
 }
 
+//
+// IInputSubsystem::gatherRealtimeMouse
+//
+void IInputSubsystem::gatherRealtimeMouse()
+{
+	IMouseInputDevice *device = static_cast<IMouseInputDevice*>(getMouseInputDevice());
+
+	if (!device)
+		return;
+
+	device->gatherRealtimeMovement();
+	while (device->hasEvent())
+	{
+		event_t ev;
+		device->getEvent(&ev);
+
+		mEvents.push(ev);
+	}
+
+}
 
 //
 // IInputSubsystem::getEvent

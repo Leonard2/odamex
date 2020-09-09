@@ -79,7 +79,7 @@ private:
 //
 // ============================================================================
 
-class ISDL12MouseInputDevice : public IInputDevice
+class ISDL12MouseInputDevice : public IMouseInputDevice
 {
 public:
 	ISDL12MouseInputDevice(int id);
@@ -92,6 +92,7 @@ public:
 	virtual void reset();
 
 	virtual void gatherEvents();
+	virtual void gatherRealtimeMovement();
 
 	virtual bool hasEvent() const
 	{	return !mEvents.empty();	}
@@ -239,7 +240,7 @@ private:
 //
 // ============================================================================
 
-class ISDL20MouseInputDevice : public IInputDevice
+class ISDL20MouseInputDevice : public IMouseInputDevice
 {
 public:
 	ISDL20MouseInputDevice(int id);
@@ -252,6 +253,7 @@ public:
 	virtual void reset();
 
 	virtual void gatherEvents();
+	virtual void gatherRealtimeMovement();
 
 	virtual bool hasEvent() const
 	{	return !mEvents.empty();	}

@@ -40,6 +40,8 @@ void STACK_ARGS I_ShutdownInput (void);
 void I_ForceUpdateGrab();
 void I_FlushInput();
 
+void I_GetRealtimeMouse();
+
 int I_GetJoystickCount();
 std::string I_GetJoystickNameFromIndex (int index);
 bool I_OpenJoystick();
@@ -98,6 +100,17 @@ public:
 	virtual void disableTextEntry() {}
 };
 
+// ============================================================================
+//
+// IMouseInputDevice abstract base class interface
+//
+// ============================================================================
+
+class IMouseInputDevice : public IInputDevice
+{
+public:
+	virtual void gatherRealtimeMovement() = 0;
+};
 
 // ============================================================================
 //
@@ -134,6 +147,7 @@ public:
 	{	return mEvents.empty() == false;	}
 
 	virtual void gatherEvents();
+	virtual void gatherRealtimeMouse();
 	virtual void getEvent(event_t* ev);
 
 	virtual std::vector<IInputDeviceInfo> getKeyboardDevices() const = 0; 
