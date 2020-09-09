@@ -96,6 +96,8 @@ fixed_t 		viewz;
 
 angle_t 		viewangle;
 
+fixed_t			viewpitch;
+
 fixed_t 		viewcos;
 fixed_t 		viewsin;
 
@@ -776,6 +778,7 @@ void R_SetupFrame (player_t *player)
 		viewy = CameraY;
 		viewz = CameraZ;
 		viewangle = camera->angle;
+		viewpitch = camera->pitch;
 	}
 	else
 	{
@@ -789,6 +792,7 @@ void R_SetupFrame (player_t *player)
 			viewy = camera->y;
 			viewz = camera->player ? camera->player->viewz : camera->z;
 			viewangle = camera->angle;
+			viewpitch = camera->pitch;
 		}
 	}
 
@@ -862,8 +866,7 @@ void R_SetupFrame (player_t *player)
 	}
 
 	// [RH] freelook stuff
-	fixed_t pitch = camera->prevpitch + FixedMul(render_lerp_amount, camera->pitch - camera->prevpitch);
-	R_ViewShear(pitch); 
+	R_ViewShear(viewpitch); 
 
 	// [RH] Hack to make windows into underwater areas possible
 	r_fakingunderwater = false;

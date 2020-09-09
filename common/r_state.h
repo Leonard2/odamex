@@ -132,6 +132,7 @@ extern fixed_t			viewy;
 extern fixed_t			viewz;
 
 extern angle_t			viewangle;
+extern fixed_t			viewpitch;
 extern AActor*			camera;		// [RH] camera instead of viewplayer
 
 extern angle_t			clipangle;

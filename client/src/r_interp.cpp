@@ -162,6 +162,7 @@ void R_InterpolateCamera(fixed_t amount)
 	{
 		// interpolate amount/FRACUNIT percent between previous value and current value
 		viewangle = camera->prevangle + FixedMul(amount, camera->angle - camera->prevangle);
+		viewpitch = camera->prevpitch + FixedMul(amount, camera->pitch - camera->prevpitch);
 		viewx = camera->prevx + FixedMul(amount, camera->x - camera->prevx);
 		viewy = camera->prevy + FixedMul(amount, camera->y - camera->prevy);
 		if (camera->player)
