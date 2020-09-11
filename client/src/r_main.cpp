@@ -56,11 +56,18 @@ extern int *walllights;
 extern dyncolormap_t NormalLight;
 extern bool r_fakingunderwater;
 
+extern bool nomousepickup;////////////////////////
+extern int mousex, mousey;
+
 EXTERN_CVAR (r_flashhom)
 EXTERN_CVAR (r_viewsize)
 EXTERN_CVAR (sv_allowwidescreen)
 EXTERN_CVAR (vid_320x200)
 EXTERN_CVAR (vid_640x400)
+
+EXTERN_CVAR (m_realtime)////////////////
+EXTERN_CVAR (m_yaw)
+EXTERN_CVAR (m_pitch)
 
 fixed_t			FocalLengthX;
 fixed_t			FocalLengthY;
@@ -785,6 +792,13 @@ void R_SetupFrame (player_t *player)
 		if (render_lerp_amount < FRACUNIT)
 		{
 			R_InterpolateCamera(render_lerp_amount);
+
+			if (camera->player && camera->player->id == consoleplayer_id && m_realtime)
+			{
+				// Override the values
+				viewangle = camera->angle - (((int)(float(mousex) * 8.f * m_yaw)) << 16);
+				viewpitch = camera->pitch - (((int)(float(mousey) * 16.f * m_pitch)) << 16);
+			}
 		}
 		else
 		{

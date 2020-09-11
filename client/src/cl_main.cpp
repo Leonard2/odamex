@@ -35,6 +35,7 @@
 #include "gi.h"
 #include "i_net.h"
 #include "i_system.h"
+#include "i_input.h"
 #include "c_dispatch.h"
 #include "st_stuff.h"
 #include "m_argv.h"
@@ -137,6 +138,8 @@ std::set<byte> teleported_players;
 
 // [SL] 2012-04-06 - moving sector snapshots received from the server
 std::map<unsigned short, SectorSnapshotManager> sector_snaps;
+
+EXTERN_CVAR (m_realtime)
 
 EXTERN_CVAR (sv_weaponstay)
 
@@ -687,6 +690,9 @@ void CL_StepTics(unsigned int count)
 //
 void CL_DisplayTics()
 {
+	if (m_realtime)
+		I_GetRealtimeMouse();
+
 	D_Display();
 }
 

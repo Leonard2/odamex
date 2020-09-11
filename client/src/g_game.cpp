@@ -161,6 +161,7 @@ EXTERN_CVAR (cl_predictpickup)
 
 EXTERN_CVAR (mouse_sensitivity)
 EXTERN_CVAR (m_pitch)
+EXTERN_CVAR (m_realtime)
 EXTERN_CVAR (m_filter)
 EXTERN_CVAR (invertmouse)
 EXTERN_CVAR (lookstrafe)
@@ -226,6 +227,7 @@ int 			turnheld;								// for accelerative turning
 // mouse values are used once
 int 			mousex;
 int 			mousey;
+bool			nomousepickup = false;
 
 // [Toke - Mouse] new mouse stuff
 int	mousexleft;
@@ -371,6 +373,19 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	if ((&consoleplayer())->spectator && Actions[ACTION_USE] && connected)
 		AddCommandString("join");
 
+	static bool realtime_mouse = false;
+	// Eat the values right here before they get used anywhere else
+	if (realtime_mouse && !nomousepickup)
+	{
+		cmd->yaw -= (int)(float(mousex) * 8.0f * m_yaw);
+		cmd->pitch += (int)(float(mousey) * 16.0f * m_pitch);
+
+		mousex = mousey = 0;
+	}
+	// For the next tic
+	realtime_mouse = m_realtime;
+	nomousepickup = false;
+
 	// [RH] only use two stage accelerative turning on the keyboard
 	//		and not the joystick, since we treat the joystick as
 	//		the analog device it is.
@@ -394,18 +409,30 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	else
 	{
 		if (Actions[ACTION_RIGHT])
+		{
 			cmd->yaw -= angleturn[tspeed];
+			nomousepickup = true;
+		}
 		if (Actions[ACTION_LEFT])
+		{
 			cmd->yaw += angleturn[tspeed];
+			nomousepickup = true;
+		}
 	}
 
 	// Joystick analog strafing -- Hyper_Eye
 	side += (int)(((float)joystrafe / (float)SHRT_MAX) * sidemove[speed]);
 
 	if (Actions[ACTION_LOOKUP])
+	{
 		look += lookspeed[speed];
+		nomousepickup = true;
+	}
 	if (Actions[ACTION_LOOKDOWN])
+	{
 		look -= lookspeed[speed];
+		nomousepickup = true;
+	}
 
 	if (Actions[ACTION_MOVEUP])
 		fly += flyspeed[speed];
@@ -415,9 +442,15 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	if (Actions[ACTION_KLOOK])
 	{
 		if (Actions[ACTION_FORWARD])
+		{
 			look += lookspeed[speed];
+			nomousepickup = true;
+		}
 		if (Actions[ACTION_BACK])
+		{
 			look -= lookspeed[speed];
+			nomousepickup = true;
+		}
 	}
 	else
 	{
@@ -431,9 +464,15 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	if(joy_freelook && sv_freelook || consoleplayer().spectator)
 	{
 		if (joy_invert)
+		{
 			look += (int)(((float)joylook / (float)SHRT_MAX) * lookspeed[speed]);
+			nomousepickup = true;
+		}
 		else
+		{
 			look -= (int)(((float)joylook / (float)SHRT_MAX) * lookspeed[speed]);
+			nomousepickup = true;
+		}
 	}
 
 	if (Actions[ACTION_MOVERIGHT])
@@ -479,14 +518,20 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	if (strafe || lookstrafe)
 		side += (int)(((float)joyturn / (float)SHRT_MAX) * sidemove[speed]);
 	else
-		cmd->yaw -= (short)((((float)joyturn / (float)SHRT_MAX) * angleturn[1]) * (joy_sensitivity / 10));
+		cmd->yaw -= (short)((((float)joyturn / (float)SHRT_MAX) * angleturn[1]) * (joy_sensitivity / 10));//////////////////
 
 	if (Actions[ACTION_MLOOK])
 	{
 		if (joy_invert)
+		{
 			look += (int)(((float)joyforward / (float)SHRT_MAX) * lookspeed[speed]);
+			nomousepickup = true;
+		}
 		else
+		{
 			look -= (int)(((float)joyforward / (float)SHRT_MAX) * lookspeed[speed]);
+			nomousepickup = true;
+		}
 	}
 	else
 	{
@@ -495,7 +540,7 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 
 	if ((Actions[ACTION_MLOOK]) || (cl_mouselook && sv_freelook) || consoleplayer().spectator)
 	{
-		int val = (int)(float(mousey) * 16.0f * m_pitch);
+		int val = (int)(float(mousey) * 16.0f * m_pitch);///////////////////////
 		if (invertmouse)
 			look -= val;
 		else
@@ -510,6 +555,8 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	{
 		sendcenterview = false;
 		look = CENTERVIEW;
+
+		nomousepickup = true;
 	}
 	else
 	{
@@ -519,7 +566,7 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	if (strafe || lookstrafe)
 		side += (int)(float(mousex) * m_side);
 	else
-		cmd->yaw -= (int)(float(mousex) * 8.0f * m_yaw);
+		cmd->yaw -= (int)(float(mousex) * 8.0f * m_yaw);//////////////////
 
 	mousex = mousey = 0;
 
@@ -534,7 +581,7 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 
 	cmd->forwardmove += forward;
 	cmd->sidemove += side;
-	cmd->pitch = look;
+	if (!m_realtime) cmd->pitch = look;
 	cmd->upmove = fly;
 
 	// special buttons
@@ -558,6 +605,8 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	{
 		turntick--;
 		cmd->yaw = (ANG180 / TURN180_TICKS) >> 16;
+
+		nomousepickup = true;
 	}
 
 	if (!longtics)
@@ -605,8 +654,8 @@ void G_ProcessMouseMovementEvent(const event_t *ev)
 	fmousex = G_ZDoomDIMouseScaleX(fmousex);
 	fmousey = G_ZDoomDIMouseScaleY(fmousey);
 
-	mousex = (int)fmousex;
-	mousey = (int)fmousey;
+	mousex += (int)fmousex;
+	mousey += (int)fmousey;
 }
 
 

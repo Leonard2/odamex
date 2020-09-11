@@ -61,6 +61,7 @@ void G_WorldDone(void);
 
 void G_Ticker(void);
 BOOL G_Responder(event_t*	ev);
+void G_ProcessMouseMovementEvent(const event_t* ev);
 
 void G_ScreenShot(const char* filename);
 

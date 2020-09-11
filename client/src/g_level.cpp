@@ -85,6 +85,7 @@ FLZOMemFile	*reset_snapshot = NULL;
 extern bool r_underwater;
 BOOL savegamerestore;
 
+extern bool nomousepickup;
 extern int mousex, mousey, joyforward, joystrafe, joyturn, joylook, Impulse;
 extern BOOL sendpause, sendsave, sendcenterview;
 
@@ -628,6 +629,7 @@ void G_DoLoadLevel (int position)
 			Actions[i] = 0;
 	joyforward = joystrafe = joyturn = joylook = 0;
 	mousex = mousey = 0;
+	nomousepickup = false;
 	sendpause = sendsave = paused = sendcenterview = false;
 
 	if (timingdemo)

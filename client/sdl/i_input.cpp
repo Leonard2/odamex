@@ -682,6 +682,8 @@ void I_StartTic (void)
 //
 void I_GetRealtimeMouse()
 {
+	I_UpdateGrab();
+
 	// Get real-time information about mouse movements
 	input_subsystem->gatherRealtimeMouse();
 	while (input_subsystem->hasEvent())
