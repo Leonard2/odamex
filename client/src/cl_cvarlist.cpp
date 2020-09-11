@@ -402,6 +402,9 @@ CVAR(			invertmouse, "0", "Invert vertical mouse movement",
 CVAR(			lookstrafe, "0", "Strafe with mouse",
 				CVARTYPE_BOOL, CVAR_CLIENTARCHIVE)
 
+CVAR(			m_realtime, "1", "Display mouse input in real time",
+				CVARTYPE_BOOL, CVAR_CLIENTARCHIVE)
+
 CVAR(			m_filter, "0", "Smooth mouse input",
 				CVARTYPE_BOOL, CVAR_CLIENTARCHIVE)
 

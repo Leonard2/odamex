@@ -121,6 +121,8 @@ EXTERN_CVAR (m_pitch)
 EXTERN_CVAR (novert)
 EXTERN_CVAR (m_side)
 EXTERN_CVAR (m_forward)
+EXTERN_CVAR (m_filter)
+EXTERN_CVAR (m_realtime)
 
 // [Ralphis - Menu] Sound Menu
 EXTERN_CVAR (snd_musicsystem)
@@ -405,6 +407,8 @@ void M_ResetMouseValues()
 	novert.RestoreDefault();
 	m_side.RestoreDefault();
 	m_forward.RestoreDefault();
+	m_filter.RestoreDefault();
+	m_realtime.RestoreDefault();
 }
 
 
@@ -416,6 +420,9 @@ static menuitem_t MouseItems[] =
 	{ redtext,	" "								, {NULL},				{0.0},	{0.0},		{0.0},		{NULL}},
 	{ discrete,	"Always FreeLook"				, {&cl_mouselook},		{2.0},	{0.0},		{0.0},		{OnOff}},
 	{ discrete,	"Invert Mouse"					, {&invertmouse},		{2.0},	{0.0},		{0.0},		{OnOff}},
+	{ redtext,	" "								, {NULL},				{0.0},	{0.0},		{0.0},		{NULL}},
+    { discrete,	"Smooth Mouse"					, {&m_filter},			{2.0},	{0.0},		{0.0},		{OnOff}},
+    { discrete, "Realtime Mouse"				, {&m_realtime},		{2.0},	{0.0},		{0.0},		{OnOff}},
 	{ redtext,	" "								, {NULL},				{0.0},	{0.0},		{0.0},		{NULL}},
 	{ discrete,	"Horizontal Movement"			, {&lookstrafe},		{2.0},	{0.0},		{0.0},		{OnOff}},
 	{ discrete,	"Vertical Movement"				, {&novert},			{2.0},	{0.0},		{0.0},		{OffOn}},
